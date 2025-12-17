@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gencoe"
+version = "0.1.0"
+description = "Python-based code generator for gamecoe"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Nir Cohen", email = "nircoe@gmail.com"}
+]
+
+[project.scripts]
+gencoe = "gencoe.__main__:main"
