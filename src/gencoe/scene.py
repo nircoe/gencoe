@@ -2,8 +2,12 @@
 
 import argparse
 
-def create_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]):
-    parser = subparsers.add_parser(name='scene', help='Generate anything needed for a new scene')
+def create_parser(subparsers):
+    parser = subparsers.add_parser(
+        name='scene', 
+        usage='%(prog)s name [-h]',
+        help='Generate anything needed for a new scene'
+    )
 
     parser.add_argument('name', type=str, help='The name of your new scene')
 
