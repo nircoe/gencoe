@@ -18,11 +18,11 @@ def create_directories_structure(root: Path):
     root.mkdir(parents=True, exist_ok=True)
     (root / 'cmake').mkdir(exist_ok=True)
     (root / 'assets').mkdir(exist_ok=True)
-    (root / 'assets' / 'components' / 'include').mkdir(parents=True, exist_ok=True)
-    (root / 'assets' / 'components' / 'src').mkdir(parents=True, exist_ok=True)
     (root / 'assets' / 'audio' / 'general' / 'sfx').mkdir(parents=True, exist_ok=True)
     (root / 'assets' / 'audio' / 'general' / 'music').mkdir(parents=True, exist_ok=True)
     (root / 'assets' / 'textures' / 'general').mkdir(parents=True, exist_ok=True)
+    (root / 'components' / 'include').mkdir(parents=True, exist_ok=True)
+    (root / 'components' / 'src').mkdir(parents=True, exist_ok=True)
 
 def generate_gamecoe_cmake(name: str, cmake_root: Path):
     gamecoe_cmake = cmake_root / 'gamecoe.cmake'
@@ -93,7 +93,13 @@ def generate_cmakelists(name: str, root: Path):
         fetch_gamecoe()
 
         # Creating {name} executable
-        add_executable({name} main.cpp)
+        file(GLOB_RECURSE COMPONENTS components/src/*.cpp)
+        add_executable({name} main.cpp ${{COMPONENTS}})
+
+        target_include_directories({name} 
+            PRIVATE 
+                components/include
+        )
 
         target_link_libraries({name}
             PRIVATE
@@ -103,6 +109,7 @@ def generate_cmakelists(name: str, root: Path):
         # Copy essential directories to build root
         copy_gamecoe_assets_to_build_root({name})
         copy_directory_to_build_root({name} "assets")
+        
     ''').strip()
 
     cmake_lists.write_text(file_text)
