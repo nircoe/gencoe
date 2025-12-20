@@ -25,7 +25,7 @@ def create_directories_structure(root: Path):
 
 def generate_gamecoe_cmake(name: str, cmake_root: Path):
     gamecoe_cmake = cmake_root / 'gamecoe.cmake'
-    git_tag = 'nircoe/main/modify_build_for_gencoe' # TODO: Change to release tag in the future
+    git_tag = 'main' # TODO: Change to release tag in the future
 
     file_text = dedent(f'''
         function(fetch_gamecoe)
