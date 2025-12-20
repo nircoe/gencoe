@@ -37,16 +37,17 @@ def get_inherit_include_path(inherit: str) -> str:
     ''').strip()
 
 def generate_hpp(name: str, hpp: Path, inherit: str = None, namespace: str = None, gamecoe: bool = False):
+    gamecoe_prefix = '' if gamecoe else 'gamecoe::'
     original_inherit = inherit
     if inherit:
-        inherit = f'gamecoe::{inherit}' if inherit in INHERIT_OPTIONS else inherit
+        inherit = f'{gamecoe_prefix}{inherit}' if inherit in INHERIT_OPTIONS else inherit
     else:
-        inherit = f'gamecoe::Component<{name}>'
+        inherit = f'{gamecoe_prefix}Component<{name}>'
 
     renderer_method = '\n\n' + dedent('''
         // Called once per frame while the GameObject is active and owns a Renderer
         virtual void render() const override;
-    ''').strip() if inherit == 'gamecoe::Renderer' else ''
+    ''').strip() if inherit == f'{gamecoe_prefix}Renderer' else ''
     renderer_method = indent(renderer_method, '    ')
 
     file_text = dedent('''
@@ -55,7 +56,7 @@ def generate_hpp(name: str, hpp: Path, inherit: str = None, namespace: str = Non
 #include <gamecoe/entity/component.hpp>
     ''').strip() + '\n'
 
-    if inherit != f'gamecoe::Component<{name}>':
+    if inherit != f'{gamecoe_prefix}Component<{name}>':
         file_text += f'{get_inherit_include_path(original_inherit)}\n'
 
     if namespace:
@@ -72,7 +73,7 @@ class {name} : public {inherit}
 public:
     static constexpr const char* TYPE_NAME = "{name}";
 
-    {name}(gamecoe::GameObject &owner); // Component "default" Constructor
+    {name}({gamecoe_prefix}GameObject &owner); // Component "default" Constructor
     // Add any additional {name} Constructors here. Ensure you pass "GameObject &owner" to the {inherit} Constructor
 
     // Remove the "= delete" if you would like to implement copy/move semantics for {name}
@@ -118,10 +119,11 @@ public:
     print(f'  - {hpp.relative_to(Path.cwd())}')
 
 def generate_cpp(name: str, hpp: Path, cpp: Path, inherit: str = None, namespace: str = None, gamecoe: bool = False):
+    gamecoe_prefix = '' if gamecoe else 'gamecoe::'
     if inherit:
-        inherit = f'gamecoe::{inherit}' if inherit in INHERIT_OPTIONS else inherit
+        inherit = f'{gamecoe_prefix}{inherit}' if inherit in INHERIT_OPTIONS else inherit
     else:
-        inherit = f'gamecoe::Component<{name}>'
+        inherit = f'{gamecoe_prefix}Component<{name}>'
     root = Path.cwd()
     hpp = hpp.relative_to(root / 'include') if gamecoe else hpp.relative_to(root / 'components' / 'include')
     hpp = f'<{hpp}>' if gamecoe else f'"{hpp}"'
@@ -132,7 +134,7 @@ def generate_cpp(name: str, hpp: Path, cpp: Path, inherit: str = None, namespace
     {{
         // Implement here
     }}
-    ''').strip() if inherit == 'gamecoe::Renderer' else ''
+    ''').strip() if inherit == f'{gamecoe_prefix}Renderer' else ''
 
     file_text = dedent(f'''
 #include {hpp}
@@ -147,7 +149,7 @@ namespace {namespace}
 
     impl_code = dedent(f'''
 // {name} constructor
-{name}::{name}(gamecoe::GameObject &owner) : {inherit}(owner) // Initialize {name} private members here
+{name}::{name}({gamecoe_prefix}GameObject &owner) : {inherit}(owner) // Initialize {name} private members here
 {{ 
     // Implement here
 }}
@@ -245,6 +247,9 @@ def generate(args: argparse.Namespace):
     gamecoe = os.environ.get('GAMECOE') is not None # for internal gamecoe development
     root = Path.cwd()
 
+    if gamecoe:
+        namespace = 'gamecoe'
+
     if not filename:
         filename = pascal_to_snake_case(name)
     
@@ -255,7 +260,7 @@ def generate(args: argparse.Namespace):
     
     if gamecoe and not (root / 'include' / 'gamecoe' / 'entity' / 'renderer').exists():
         print('[gencoe] Error: Not in gamecoe root directory (Internal gamecoe development)')
-        print('[gencoe] Run "gencoe component <name>" from your gamecoe root directory')
+        print('[gencoe] Run "GAMECOE=1 gencoe component <name>" from your gamecoe root directory')
         return
     
     if inherit and inherit not in INHERIT_OPTIONS:
@@ -266,13 +271,13 @@ def generate(args: argparse.Namespace):
     hpp_path = (hpp_path / inherit.lower()) if inherit else hpp_path
     hpp_path.mkdir(parents=True, exist_ok=True)
     hpp_path = hpp_path / f'{filename}.hpp'
-    generate_hpp(name, hpp_path, inherit, namespace)
+    generate_hpp(name, hpp_path, inherit, namespace, gamecoe)
 
     cpp_path = (root / 'src' / 'gamecoe' / 'entity') if gamecoe else (root / 'components' / 'src')
     cpp_path = (cpp_path / inherit.lower()) if inherit else cpp_path
     cpp_path.mkdir(parents=True, exist_ok=True)
     cpp_path = cpp_path / f'{filename}.cpp'
-    generate_cpp(name, hpp_path, cpp_path, inherit, namespace)
+    generate_cpp(name, hpp_path, cpp_path, inherit, namespace, gamecoe)
 
     print(f'[gencoe] {name} Component files are ready for implementation')
     print('[gencoe] Make sure you reconfigure your project CMake before building it next time')

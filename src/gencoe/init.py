@@ -93,7 +93,7 @@ def generate_cmakelists(name: str, root: Path):
         fetch_gamecoe()
 
         # Creating {name} executable
-        file(GLOB_RECURSE COMPONENTS components/src/*.cpp)
+        file(GLOB_RECURSE COMPONENTS "components/src/*.cpp")
         add_executable({name} main.cpp ${{COMPONENTS}})
 
         target_include_directories({name} 
