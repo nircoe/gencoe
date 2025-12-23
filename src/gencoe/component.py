@@ -5,6 +5,7 @@ from pathlib import Path
 from textwrap import dedent, indent
 import re
 import os
+from jinja2 import Environment, PackageLoader
 
 INHERIT_OPTIONS = {
     'Renderer': 'gamecoe/entity/renderer/renderer.hpp'

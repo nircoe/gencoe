@@ -12,6 +12,9 @@ license = {text = "MIT"}
 authors = [
     {name = "Nir Cohen", email = "nircoe@gmail.com"}
 ]
+dependencies = [
+    "jinja2>=3.0.0",
+]
 
 [project.scripts]
 gencoe = "gencoe.__main__:main"
