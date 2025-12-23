@@ -19,7 +19,7 @@ def create_directories_structure(name: str):
     (root / 'assets' / 'audio' / name / 'music').mkdir(parents=True, exist_ok=True)
     (root / 'assets' / 'textures' / name).mkdir(parents=True, exist_ok=True)
 
-    print(f'[gencoe] Created scene directories for \"{name}\":')
+    print(f'[gencoe] Created scene directories for "{name}":')
     print(f'  - assets/audio/{name}/sfx/')
     print(f'  - assets/audio/{name}/music/')
     print(f'  - assets/textures/{name}/\n')
@@ -43,10 +43,10 @@ def generate(args: argparse.Namespace):
 
     if not (Path.cwd() / 'assets' / 'audio' / 'general').exists():
         print('[gencoe] Error: Not in a gamecoe project root directory')
-        print('[gencoe] Run \"gencoe scene <name>\" from your game project root directory')
+        print('[gencoe] Run "gencoe scene <name>" from your game project root directory')
         return
 
     create_directories_structure(name)
 
-    print(f'[gencoe] Add the following code in order to create the Scene \"{name}\":')
-    print(f'auto &{name} = {get_project_name()}.createScene(\"{name}\");')
+    print(f'[gencoe] Add the following code in order to create the Scene "{name}":')
+    print(f'auto &{name} = {get_project_name()}.createScene("{name}");')
