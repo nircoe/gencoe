@@ -144,7 +144,7 @@ def generate_main_cpp(name: str, root: Path):
             auto &gameObject = scene.createGameObject("GameObjectName");
 
             // Set a Renderer to a GameObject
-            gameObject.setRenderer(gamecoe::ShapeRenderer::cube(gameObject, colorcoe::maroon()));
+            gameObject.setRenderer(gamecoe::ShapeRenderer::box(gameObject, colorcoe::maroon()));
 
             // Add a new Component to a GameObject (Camera in this example, can be any kind of Component, except Transform)
             // gameObject.addComponent<Camera>(std::make_unique<Camera>(gameObject));
