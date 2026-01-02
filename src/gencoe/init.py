@@ -3,6 +3,7 @@
 import argparse
 from pathlib import Path
 from textwrap import dedent
+from jinja2 import Environment, PackageLoader
 
 def create_parser(subparsers):
     parser = subparsers.add_parser(
